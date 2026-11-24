@@ -1,10 +1,18 @@
-import { Controller, Get, Injectable, Module } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { Controller, Get, Injectable, Module } from "@nestjs/common";
+import { NestFactory } from "@nestjs/core";
+import { WithdrawModule } from "./withdraw/withdraw.module.js";
+import { TransferModule } from "./transfer/transfer.module.js";
+import { DepositModule } from "./deposit/deposit.module.js";
+import { HistoryModule } from "./history/history.module.js";
+import { DrizzleModule } from "@nestjs/drizzle";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { DatabaseModule } from "./database/database.module.js";
+import { database } from "./database/client.js";
 
 @Injectable()
 class AppService {
   getHello(): string {
-    return 'Hello World!';
+    return "Hello World!";
   }
 }
 
@@ -21,6 +29,21 @@ class AppController {
 @Module({
   controllers: [AppController],
   providers: [AppService],
+  imports: [
+    WithdrawModule,
+    TransferModule,
+    DepositModule,
+    HistoryModule,
+    DrizzleModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        db: database,
+        connection: config.getOrThrow("process.env.DATABASE_URL"),
+      }),
+    }),
+    DatabaseModule,
+  ],
 })
 class AppModule {}
 
