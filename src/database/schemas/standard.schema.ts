@@ -9,6 +9,15 @@ export const transactionTypeEnum = p.pgEnum(
 );
 export const bankEnum = p.pgEnum("banks", Banks);
 
+export const defaultUser = p.pgTable("user", {
+  id: p.uuid().primaryKey().defaultRandom(),
+  name: p.text().notNull(),
+  balance: p.integer().notNull().default(0),
+  pin: p.integer().notNull(),
+  bank: p.text().notNull().default("Loixrang Bank"),
+  createdAt: p.timestamp({ withTimezone: true }).notNull().defaultNow(),
+})
+
 export const accounts = p.pgTable("account", {
   id: p.uuid().primaryKey().defaultRandom(),
   name: p.text().notNull(),
@@ -28,6 +37,11 @@ export const transactions = p.pgTable("transaction", {
     .references(() => accounts.id),
   createdAt: p.timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
+
+export const transactHistory = p.pgTable("history", {
+  transactionId: p.uuid().primaryKey().references(() => transactions.id),
+  description: p.text().notNull()
+})
 
 export const accountsRelations = relations(accounts, ({ many }) => ({
   transactions: many(transactions),

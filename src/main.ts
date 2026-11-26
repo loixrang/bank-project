@@ -1,4 +1,4 @@
-import { Controller, Get, Injectable, Module } from "@nestjs/common";
+import { Controller, Get, Injectable, Module, StandardSchemaValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { WithdrawModule } from "./withdraw/withdraw.module.js";
 import { TransferModule } from "./transfer/transfer.module.js";
@@ -8,6 +8,7 @@ import { DrizzleModule } from "@nestjs/drizzle";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { DatabaseModule } from "./database/database.module.js";
 import { database } from "./database/client.js";
+import { UserGuard } from "./activeUser/user.js";
 
 @Injectable()
 class AppService {
@@ -50,5 +51,8 @@ class AppModule {}
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   await app.listen(process.env.PORT ?? 3000);
+  app.useGlobalPipes(
+    new StandardSchemaValidationPipe()
+  )
 }
 await bootstrap();

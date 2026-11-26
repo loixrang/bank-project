@@ -8,6 +8,34 @@
       "when": 1795556392543,
       "tag": "0000_aberrant_alex_wilder",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795686106806,
+      "tag": "0001_optimal_stranger",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795687541626,
+      "tag": "0002_sudden_wolfsbane",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1795688652038,
+      "tag": "0003_flat_iron_fist",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795691149029,
+      "tag": "0004_gifted_zaran",
+      "breakpoints": true
     }
   ]
 }

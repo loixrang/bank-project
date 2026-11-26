@@ -1,45 +1,22 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
+  UseGuards,
+  Session,
 } from "@nestjs/common";
 import { WithdrawService } from "./withdraw.service.js";
-import { CreateWithdrawDto } from "./dto/create-withdraw.dto.js";
-import { UpdateWithdrawDto } from "./dto/update-withdraw.dto.js";
+import { createWithdrawSchema, type CreateWithdrawDto } from "./dto/create-withdraw.dto.js";
+import {UserGuard } from "../activeUser/user.js";
+import {type User } from "../types/user.js";
 
+@UseGuards(UserGuard)
 @Controller("withdraw")
 export class WithdrawController {
   constructor(private readonly withdrawService: WithdrawService) {}
 
-  @Post()
-  create(@Body() createWithdrawDto: CreateWithdrawDto) {
-    return this.withdrawService.create(createWithdrawDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.withdrawService.findAll();
-  }
-
-  @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.withdrawService.findOne(+id);
-  }
-
-  @Patch(":id")
-  update(
-    @Param("id") id: string,
-    @Body() updateWithdrawDto: UpdateWithdrawDto,
-  ) {
-    return this.withdrawService.update(+id, updateWithdrawDto);
-  }
-
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.withdrawService.remove(+id);
+@Post()
+create(@Body({schema: createWithdrawSchema}) createWithdrawDto: CreateWithdrawDto, @Session() user: User) {
+    return this.withdrawService.create(createWithdrawDto, user);
   }
 }

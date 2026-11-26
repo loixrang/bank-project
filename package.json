@@ -10,7 +10,11 @@
     "build": "nest build",
     "start": "bun src/main.ts",
     "dev": "bun --watch --check src/main.ts",
-    "typecheck": "bun check"
+    "typecheck": "bun check",
+    "db:generate": "bunx drizzle-kit generate",
+    "db:migrate": "bunx drizzle-kit migrate",
+    "db:update": "bun db:generate && bun db:migrate",
+    "db:push": "bunx drizzle-kit push"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",
