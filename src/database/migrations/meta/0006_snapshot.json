@@ -146,12 +146,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -185,12 +181,8 @@
           "name": "history_transaction_id_transaction_id_fk",
           "tableFrom": "history",
           "tableTo": "transaction",
-          "columnsFrom": [
-            "transaction_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["transaction_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -244,12 +236,8 @@
           "name": "transaction_user_id_user_id_fk",
           "tableFrom": "transaction",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -265,21 +253,12 @@
     "public.banks": {
       "name": "banks",
       "schema": "public",
-      "values": [
-        "FCMB",
-        "WEMA",
-        "fidelity",
-        "Access"
-      ]
+      "values": ["FCMB", "WEMA", "fidelity", "Access"]
     },
     "public.transaction_type": {
       "name": "transaction_type",
       "schema": "public",
-      "values": [
-        "transfer",
-        "withdraw",
-        "deposit"
-      ]
+      "values": ["transfer", "withdraw", "deposit"]
     }
   },
   "schemas": {},

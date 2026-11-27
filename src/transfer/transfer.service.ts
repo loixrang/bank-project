@@ -1,10 +1,20 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadGatewayException,
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { CreateTransferDto } from "./dto/create-transfer.dto.js";
 import { InjectDrizzle } from "@nestjs/drizzle";
 import { type Database } from "../database/client.js";
 import { VerifyAccountDto } from "./dto/verify-account.dto.js";
 import { UserSession } from "../types/express.js";
-import { accounts, defaultUser, transactHistory, transactions } from "../database/schemas/standard.schema.js";
+import {
+  accounts,
+  defaultUser,
+  transactHistory,
+  transactions,
+} from "../database/schemas/standard.schema.js";
 import { and, eq } from "drizzle-orm";
 import { getBalance, verifyAmount } from "../functions/functions.js";
 import { TransactionType } from "../types/transact-type.js";
@@ -13,8 +23,8 @@ import { TransactionType } from "../types/transact-type.js";
 export class TransferService {
   constructor(@InjectDrizzle() private readonly db: Database) {}
   async create(createTransferDto: CreateTransferDto, req: UserSession) {
-    const userBalance = await getBalance(req.user.id)
-    verifyAmount(createTransferDto.amount, userBalance.balance)
+    const userBalance = await getBalance(req.user.id);
+    verifyAmount(createTransferDto.amount, userBalance.balance);
     const transfer = await this.db.transaction(async (tx) => {
       const [verifyPin] = await tx
         .select({ pin: defaultUser.pin })
@@ -42,12 +52,16 @@ export class TransferService {
         .returning();
 
       return { transfer, history };
-    })
+    });
+    if (!transfer) {
+      throw new BadGatewayException("could not complete transfer");
+    }
+    return transfer;
   }
   async verify(verifyAccountDto: VerifyAccountDto) {
     const [acc] = await this.db
       .select({
-        name: accounts.name
+        name: accounts.name,
       })
       .from(accounts)
       .where(
@@ -55,10 +69,11 @@ export class TransferService {
           eq(accounts.number, verifyAccountDto.accountNumber),
           eq(accounts.bank, verifyAccountDto.bank),
         ),
-    ).limit(1);
+      )
+      .limit(1);
     if (!acc) {
-      throw new NotFoundException("Account not found")
+      throw new NotFoundException("Account not found");
     }
-    return acc 
+    return acc;
   }
 }

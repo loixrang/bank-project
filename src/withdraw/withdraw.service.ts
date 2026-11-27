@@ -1,4 +1,8 @@
-import { BadGatewayException, BadRequestException, Injectable } from "@nestjs/common";
+import {
+  BadGatewayException,
+  BadRequestException,
+  Injectable,
+} from "@nestjs/common";
 import { CreateWithdrawDto } from "./dto/create-withdraw.dto.js";
 import { InjectDrizzle } from "@nestjs/drizzle";
 import { type Database } from "../database/client.js";
