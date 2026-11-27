@@ -6,37 +6,20 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from "@nestjs/common";
 import { HistoryService } from "./history.service.js";
-import { CreateHistoryDto } from "./dto/create-history.dto.js";
-import { UpdateHistoryDto } from "./dto/update-history.dto.js";
+import { UserGuard } from "../activeUser/user.js";
+import { CurrentUser } from "../activeUser/currentUser.js";
+import { type UserSession } from "../types/express.js";
 
+@UseGuards(UserGuard)
 @Controller("history")
 export class HistoryController {
   constructor(private readonly historyService: HistoryService) {}
 
-  @Post()
-  create(@Body() createHistoryDto: CreateHistoryDto) {
-    return this.historyService.create(createHistoryDto);
-  }
-
   @Get()
-  findAll() {
-    return this.historyService.findAll();
-  }
-
-  @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.historyService.findOne(+id);
-  }
-
-  @Patch(":id")
-  update(@Param("id") id: string, @Body() updateHistoryDto: UpdateHistoryDto) {
-    return this.historyService.update(+id, updateHistoryDto);
-  }
-
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.historyService.remove(+id);
+  findAll(@CurrentUser() req: UserSession) {
+    return this.historyService.findAll(req);
   }
 }

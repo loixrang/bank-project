@@ -3,7 +3,6 @@ import {
   Get,
   Injectable,
   Module,
-  Req,
   StandardSchemaValidationPipe,
   UseGuards,
 } from "@nestjs/common";

@@ -43,6 +43,13 @@
       "when": 1795710936332,
       "tag": "0005_cultured_lucky_pierre",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795788669698,
+      "tag": "0006_organic_skullbuster",
+      "breakpoints": true
     }
   ]
 }

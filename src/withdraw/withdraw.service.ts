@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadGatewayException, BadRequestException, Injectable } from "@nestjs/common";
 import { CreateWithdrawDto } from "./dto/create-withdraw.dto.js";
 import { InjectDrizzle } from "@nestjs/drizzle";
 import { type Database } from "../database/client.js";
@@ -31,7 +31,7 @@ export class WithdrawService {
         .insert(transactions)
         .values({
           type: TransactionType.WITHDRAW,
-          accountId: current.user.id,
+          userId: current.user.id,
           amount: createWithdrawDto.amount,
         })
         .returning();
@@ -46,7 +46,9 @@ export class WithdrawService {
 
       return { withdrawal, history };
     });
-
+    if (!withdraw) {
+      throw new BadGatewayException("Could not complete withdrawal");
+    }
     return withdraw;
   }
 }

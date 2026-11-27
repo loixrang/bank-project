@@ -1,42 +1,20 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from "@nestjs/common";
+import { Controller, Post, Body, UseGuards } from "@nestjs/common";
 import { DepositService } from "./deposit.service.js";
-import { CreateDepositDto } from "./dto/create-deposit.dto.js";
-import { UpdateDepositDto } from "./dto/update-deposit.dto.js";
+import { type CreateDepositDto } from "./dto/create-deposit.dto.js";
+import { UserGuard } from "../activeUser/user.js";
+import { CurrentUser } from "../activeUser/currentUser.js";
+import { type UserSession } from "../types/express.js";
 
+@UseGuards(UserGuard)
 @Controller("deposit")
 export class DepositController {
   constructor(private readonly depositService: DepositService) {}
 
   @Post()
-  create(@Body() createDepositDto: CreateDepositDto) {
-    return this.depositService.create(createDepositDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.depositService.findAll();
-  }
-
-  @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.depositService.findOne(+id);
-  }
-
-  @Patch(":id")
-  update(@Param("id") id: string, @Body() updateDepositDto: UpdateDepositDto) {
-    return this.depositService.update(+id, updateDepositDto);
-  }
-
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.depositService.remove(+id);
+  create(
+    @Body() createDepositDto: CreateDepositDto,
+    @CurrentUser() req: UserSession,
+  ) {
+    return this.depositService.create(createDepositDto, req.user.id);
   }
 }

@@ -41,10 +41,10 @@ export const transactions = p.pgTable("transaction", {
   id: p.uuid().primaryKey().defaultRandom(),
   type: transactionTypeEnum().notNull(),
   amount: p.integer().notNull(),
-  accountId: p
+  userId: p
     .uuid()
     .notNull()
-    .references(() => accounts.id),
+    .references(() => defaultUser.id),
   createdAt: p.timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -62,7 +62,7 @@ export const accountsRelations = relations(accounts, ({ many }) => ({
 
 export const transactionsRelations = relations(transactions, ({ one }) => ({
   account: one(accounts, {
-    fields: [transactions.accountId],
+    fields: [transactions.userId],
     references: [accounts.id],
   }),
 }));
