@@ -16,7 +16,7 @@ import { UserSession } from "../types/express.js";
 export class WithdrawService {
   constructor(@InjectDrizzle() private readonly db: Database) {}
   async create(createWithdrawDto: CreateWithdrawDto, current: UserSession) {
-    const balance = (await getBalance(current.user?.id)).balance;
+    const balance = (await getBalance(current.user.id)).balance;
     verifyAmount(createWithdrawDto.amount, balance);
     const withdraw = await this.db.transaction(async (tx) => {
       const [verifyPin] = await tx

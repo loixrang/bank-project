@@ -3,11 +3,11 @@ import { defaultUser } from "../database/schemas/standard.schema.js";
 import { database } from "../database/client.js";
 import { eq } from "drizzle-orm";
 
-async function getBalance(id: string) {
+async function getBalance(userId: string) {
   const [userBalance] = await database
     .select({ balance: defaultUser.balance })
     .from(defaultUser)
-    .where(eq(defaultUser.id, id))
+    .where(eq(defaultUser.id, userId))
     .limit(1);
   return userBalance;
 }
