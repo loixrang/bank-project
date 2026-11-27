@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { LoginDto } from "./dto/create-auth.dto.js";
 import { InjectDrizzle } from "@nestjs/drizzle";
 import { type Database } from "../database/client.js";
@@ -11,6 +11,9 @@ import {
 export class AuthService {
   constructor(@InjectDrizzle() private readonly db: Database) {}
   async create(dto: LoginDto) {
+    if (dto.pin < 1000 || dto.pin > 9999) {
+      throw new BadRequestException("Pin must be 4 chars");
+    }
     const userStartUp = await this.db.transaction(async (tx) => {
       const [user] = await tx
         .insert(defaultUser)

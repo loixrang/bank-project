@@ -7,6 +7,12 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
+import {
+  SwaggerModule,
+  DocumentBuilder,
+  SwaggerDocumentOptions,
+} from "@nestjs/swagger";
+import { createSchema } from "zod-openapi";
 import { WithdrawModule } from "./withdraw/withdraw.module.js";
 import { TransferModule } from "./transfer/transfer.module.js";
 import { DepositModule } from "./deposit/deposit.module.js";
@@ -24,7 +30,7 @@ import { type UserSession } from "./types/express.js";
 @Injectable()
 class AppService {
   getHello(): string {
-    return "Hello World!";
+    return "Loixrang Bank";
   }
 }
 
@@ -70,6 +76,24 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
   app.useGlobalPipes(new StandardSchemaValidationPipe());
+  const documentOptions: SwaggerDocumentOptions = {
+    standardSchemaConverter: (schema, { schemaType }) => {
+      const converted = createSchema(schema as never, {
+        io: schemaType,
+        openapiVersion: "3.0.0",
+      });
+      return { schema: converted.schema, components: converted.components };
+    },
+  };
+  const config = new DocumentBuilder()
+    .setTitle("Loixrang Bank")
+    .setDescription("bank API description")
+    .setVersion("1.0")
+    .addTag("bank")
+    .build();
+  const documentFactory = () =>
+    SwaggerModule.createDocument(app, config, documentOptions);
+  SwaggerModule.setup("api", app, documentFactory);
   await app.listen(process.env.PORT ?? 3000);
 }
 await bootstrap();

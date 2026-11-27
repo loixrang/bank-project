@@ -38,7 +38,7 @@ export class TransferService {
         .select({ name: accounts.name })
         .from(accounts)
         .where(eq(accounts.id, createTransferDto.accId));
-      
+
       const [transfer] = await tx
         .insert(transactions)
         .values({
