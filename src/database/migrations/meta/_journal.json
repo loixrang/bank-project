@@ -50,6 +50,20 @@
       "when": 1795788669698,
       "tag": "0006_organic_skullbuster",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1795807396007,
+      "tag": "0007_broken_excalibur",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1795808236132,
+      "tag": "0008_powerful_black_tom",
+      "breakpoints": true
     }
   ]
 }

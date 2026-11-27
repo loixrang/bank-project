@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-} from "@nestjs/common";
+import { Controller, Get, UseGuards } from "@nestjs/common";
 import { HistoryService } from "./history.service.js";
 import { UserGuard } from "../activeUser/user.js";
 import { CurrentUser } from "../activeUser/currentUser.js";

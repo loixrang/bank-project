@@ -32,7 +32,6 @@ export const accounts = p.pgTable("account", {
   id: p.uuid().primaryKey().defaultRandom(),
   name: p.text().notNull(),
   number: p.integer().notNull(),
-  balance: p.integer().notNull(),
   bank: bankEnum().notNull(),
   createdAt: p.timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
@@ -53,6 +52,10 @@ export const transactHistory = p.pgTable("history", {
     .uuid()
     .primaryKey()
     .references(() => transactions.id),
+  userId: p
+    .uuid()
+    .notNull()
+    .references(() => defaultUser.id),
   description: p.text().notNull(),
 });
 

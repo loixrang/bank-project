@@ -13,11 +13,11 @@ async function getBalance(userId: string) {
 }
 
 async function verifyAmount(amount: number, balance: number) {
-  if (balance < amount) {
-    throw new BadRequestException("balance is less than amount");
-  }
   if (amount < 100) {
     throw new BadRequestException("amount should be at least 100");
+  }
+  if (balance < amount) {
+    throw new BadRequestException("balance is less than amount");
   }
   return true;
 }

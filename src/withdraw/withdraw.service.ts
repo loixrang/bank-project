@@ -19,14 +19,14 @@ import { UserSession } from "../types/express.js";
 @Injectable()
 export class WithdrawService {
   constructor(@InjectDrizzle() private readonly db: Database) {}
-  async create(createWithdrawDto: CreateWithdrawDto, current: UserSession) {
-    const balance = (await getBalance(current.user.id)).balance;
-    verifyAmount(createWithdrawDto.amount, balance);
+  async create(createWithdrawDto: CreateWithdrawDto, req: UserSession) {
+    const balance = (await getBalance(req.user.id)).balance;
+    await verifyAmount(createWithdrawDto.amount, balance);
     const withdraw = await this.db.transaction(async (tx) => {
       const [verifyPin] = await tx
         .select({ pin: defaultUser.pin })
         .from(defaultUser)
-        .where(eq(defaultUser.id, current.user.id))
+        .where(eq(defaultUser.id, req.user.id))
         .limit(1);
       if (verifyPin.pin !== createWithdrawDto.pin) {
         throw new BadRequestException("Wrong pin, try again");
@@ -35,20 +35,29 @@ export class WithdrawService {
         .insert(transactions)
         .values({
           type: TransactionType.WITHDRAW,
-          userId: current.user.id,
+          userId: req.user.id,
           amount: createWithdrawDto.amount,
         })
         .returning();
 
-      const [history] = await tx
+      await tx
         .insert(transactHistory)
         .values({
           transactionId: withdrawal.id,
+          userId: req.user.id,
           description: `You withdrew ${withdrawal.amount}`,
         })
         .returning();
 
-      return { withdrawal, history };
+      await tx
+        .update(defaultUser)
+        .set({
+          balance: withdrawal.amount,
+        })
+        .where(eq(defaultUser.id, req.user.id))
+        .returning();
+
+      return { withdrawal };
     });
     if (!withdraw) {
       throw new BadGatewayException("Could not complete withdrawal");

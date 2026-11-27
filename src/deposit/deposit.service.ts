@@ -7,10 +7,12 @@ import { CreateDepositDto } from "./dto/create-deposit.dto.js";
 import { InjectDrizzle } from "@nestjs/drizzle";
 import { type Database } from "../database/client.js";
 import {
+  defaultUser,
   transactHistory,
   transactions,
 } from "../database/schemas/standard.schema.js";
 import { TransactionType } from "../types/transact-type.js";
+import { eq } from "drizzle-orm";
 
 @Injectable()
 export class DepositService {
@@ -35,15 +37,23 @@ export class DepositService {
         throw new BadGatewayException("Could not deposit");
       }
 
-      const [history] = await tx
+      await tx
         .insert(transactHistory)
         .values({
           transactionId: deposit.id,
+          userId,
           description: `You deposited ${deposit.amount}`,
         })
         .returning();
 
-      return { deposit, history };
+      await tx
+        .update(defaultUser)
+        .set({
+          balance: deposit.amount,
+        })
+        .where(eq(defaultUser.id, userId))
+        .returning();
+      return { deposit };
     });
     if (!createDeposit) {
       throw new BadGatewayException("Could not complete deposit");

@@ -24,7 +24,7 @@ export class TransferService {
   constructor(@InjectDrizzle() private readonly db: Database) {}
   async create(createTransferDto: CreateTransferDto, req: UserSession) {
     const userBalance = await getBalance(req.user.id);
-    verifyAmount(createTransferDto.amount, userBalance.balance);
+    await verifyAmount(createTransferDto.amount, userBalance.balance);
     const transfer = await this.db.transaction(async (tx) => {
       const [verifyPin] = await tx
         .select({ pin: defaultUser.pin })
@@ -34,6 +34,11 @@ export class TransferService {
       if (verifyPin.pin !== createTransferDto.pin) {
         throw new BadRequestException("Wrong pin, try again");
       }
+      const [accName] = await tx
+        .select({ name: accounts.name })
+        .from(accounts)
+        .where(eq(accounts.id, createTransferDto.accId));
+      
       const [transfer] = await tx
         .insert(transactions)
         .values({
@@ -43,15 +48,24 @@ export class TransferService {
         })
         .returning();
 
-      const [history] = await tx
+      await tx
         .insert(transactHistory)
         .values({
           transactionId: transfer.id,
-          description: `You transferred ${transfer.amount} to ${createTransferDto.accName}`,
+          userId: req.user.id,
+          description: `You transferred ${transfer.amount} to ${accName.name}`,
         })
         .returning();
 
-      return { transfer, history };
+      await tx
+        .update(defaultUser)
+        .set({
+          balance: transfer.amount,
+        })
+        .where(eq(defaultUser.id, req.user.id))
+        .returning();
+
+      return { transfer };
     });
     if (!transfer) {
       throw new BadGatewayException("could not complete transfer");
@@ -61,7 +75,7 @@ export class TransferService {
   async verify(verifyAccountDto: VerifyAccountDto) {
     const [acc] = await this.db
       .select({
-        name: accounts.name,
+        id: accounts.id,
       })
       .from(accounts)
       .where(
