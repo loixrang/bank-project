@@ -16,7 +16,17 @@ export const defaultUser = p.pgTable("user", {
   pin: p.integer().notNull(),
   bank: p.text().notNull().default("Loixrang Bank"),
   createdAt: p.timestamp({ withTimezone: true }).notNull().defaultNow(),
-})
+});
+
+export const session = p.pgTable("session", {
+  id: p.uuid().primaryKey().defaultRandom(),
+  userId: p
+    .uuid()
+    .notNull()
+    .references(() => defaultUser.id),
+  expiresAt: p.timestamp({ withTimezone: true }).notNull().defaultNow(),
+  createdAt: p.timestamp({ withTimezone: true }).notNull().defaultNow(),
+});
 
 export const accounts = p.pgTable("account", {
   id: p.uuid().primaryKey().defaultRandom(),
@@ -39,9 +49,12 @@ export const transactions = p.pgTable("transaction", {
 });
 
 export const transactHistory = p.pgTable("history", {
-  transactionId: p.uuid().primaryKey().references(() => transactions.id),
-  description: p.text().notNull()
-})
+  transactionId: p
+    .uuid()
+    .primaryKey()
+    .references(() => transactions.id),
+  description: p.text().notNull(),
+});
 
 export const accountsRelations = relations(accounts, ({ many }) => ({
   transactions: many(transactions),

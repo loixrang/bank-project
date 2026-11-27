@@ -22,4 +22,4 @@ async function verifyAmount(amount: number, balance: number) {
   return true;
 }
 
-export {getBalance, verifyAmount}
+export { getBalance, verifyAmount };

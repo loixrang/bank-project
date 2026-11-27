@@ -1,4 +1,12 @@
-import { Controller, Get, Injectable, Module, StandardSchemaValidationPipe } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Injectable,
+  Module,
+  Req,
+  StandardSchemaValidationPipe,
+  UseGuards,
+} from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { WithdrawModule } from "./withdraw/withdraw.module.js";
 import { TransferModule } from "./transfer/transfer.module.js";
@@ -8,7 +16,11 @@ import { DrizzleModule } from "@nestjs/drizzle";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { DatabaseModule } from "./database/database.module.js";
 import { database } from "./database/client.js";
+import { AuthModule } from "./auth/auth.module.js";
+import { CurrentUser } from "./activeUser/currentUser.js";
+import cookieParser from "cookie-parser";
 import { UserGuard } from "./activeUser/user.js";
+import { type UserSession } from "./types/express.js";
 
 @Injectable()
 class AppService {
@@ -25,6 +37,12 @@ class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  @UseGuards(UserGuard)
+  @Get("me")
+  getMe(@CurrentUser() req: UserSession) {
+    return req;
+  }
 }
 
 @Module({
@@ -40,19 +58,19 @@ class AppController {
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         db: database,
-        connection: config.getOrThrow("process.env.DATABASE_URL"),
+        connection: config.getOrThrow("DATABASE_URL"),
       }),
     }),
     DatabaseModule,
+    AuthModule,
   ],
 })
 class AppModule {}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(cookieParser());
   await app.listen(process.env.PORT ?? 3000);
-  app.useGlobalPipes(
-    new StandardSchemaValidationPipe()
-  )
+  app.useGlobalPipes(new StandardSchemaValidationPipe());
 }
 await bootstrap();
